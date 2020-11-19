@@ -74,6 +74,7 @@
 #include "leftmenu.h"
 #include <vtkOBJReader.h>
 #include <vtkSmartPointer.h>
+#include <QFutureWatcher>
 
 class QWinWidget : public QWidget
 {
@@ -104,8 +105,10 @@ protected:
 
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
-
+private slots:
+    void handleObjLoaded();
 private:
+    void LoadObj();
     QGridLayout m_Layout;
 
     Widget* p_Widget;
@@ -116,6 +119,8 @@ private:
     vtkSmartPointer<vtkPolyDataMapper> mapper;
     vtkSmartPointer<vtkRenderer> renderer;
     vtkSmartPointer<vtkActor> actor;
+    QString objFilePath;
+    QFutureWatcher<void> watcher;
 
     WinNativeWindow* p_ParentWinNativeWindow;
     HWND m_ParentNativeWindowHandle;

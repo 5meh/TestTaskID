@@ -55,6 +55,9 @@
 #include <qt_windows.h>
 #include <QWindow>
 #include <QFileDialog>
+#include <QFuture>
+#include <QFutureWatcher>
+#include<QtConcurrent/QtConcurrentRun>
 
 #include <vtkOBJImporter.h>
 #include <vtkOBJReader.h>
@@ -366,18 +369,24 @@ void QWinWidget::onCloseButtonClicked()
     }
 }
 
-void QWinWidget::browseButtonClicked(QString path)
+void QWinWidget::LoadObj()
 {
-    std::string tmp = path.toStdString();
-
-    reader = vtkSmartPointer<vtkOBJReader>::New();
-    reader->SetFileName(tmp.c_str());
+    std::string str = reader->GetFileName();
     reader->Update();
-    mapper->SetInputConnection(reader->GetOutputPort());
-    removeButtonClicked();
-    actor->SetMapper(mapper);    
-    renderer->AddActor(actor);
+}
 
+void QWinWidget::handleObjLoaded()
+{
+
+    mapper->SetInputConnection(reader->GetOutputPort());
+    vtkActorCollection *Actors = renderer->GetActors();
+    vtkActor *Actor;
+    for( Actors->InitTraversal(); (Actor = Actors->GetNextItem())!=NULL; )
+    {
+        renderer->RemoveActor( Actor );
+    }
+    actor->SetMapper(mapper);
+    renderer->AddActor(actor);
     renderer->ResetCamera();
     renderer->GetActiveCamera()->Azimuth(30);
     renderer->GetActiveCamera()->Elevation(30);
@@ -387,6 +396,30 @@ void QWinWidget::browseButtonClicked(QString path)
 
     sceneWidget->renderWindow()->Render();
     p_menu->movie->stop();
+}
+
+void QWinWidget::browseButtonClicked(QString path)
+{
+    objFilePath = path;
+
+    reader = vtkSmartPointer<vtkOBJReader>::New();
+    reader->SetFileName(objFilePath.toStdString().c_str());
+    QFuture<void> future = QtConcurrent::run(&*this, &QWinWidget::LoadObj);
+    connect(&watcher, &QFutureWatcher<void>::finished, &*this, &QWinWidget::handleObjLoaded);
+    watcher.setFuture(future);
+    //tcher.
+    //reader->Update();
+
+
+//    renderer->ResetCamera();
+//    renderer->GetActiveCamera()->Azimuth(30);
+//    renderer->GetActiveCamera()->Elevation(30);
+//    renderer->GetActiveCamera()->Dolly(1.5);
+//    renderer->ResetCameraClippingRange();
+//    renderer->SetBackground(255,255,255);
+
+//    sceneWidget->renderWindow()->Render();
+//    p_menu->movie->stop();
 
 }
 
