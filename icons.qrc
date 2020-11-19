@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>images/close_app.png</file>
+        <file>images/close_app_hovered.png</file>
+        <file>images/max_app.png</file>
+        <file>images/max_app_ hovered.png</file>
+        <file>images/minimize_app.png</file>
+        <file>images/minimize_app_hovered.png</file>
+    </qresource>
+</RCC>
