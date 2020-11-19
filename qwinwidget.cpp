@@ -130,7 +130,7 @@ QWinWidget::QWinWidget()
     setContentsMargins(0, 0, 0, 0);
     setLayout(&m_Layout);
     m_Layout.setContentsMargins(0, 0, 0, 0);
-    m_Layout.setSpacing(0);
+    //m_Layout.setSpacing(0);
 
     //Create the true app widget 
     p_Widget = new Widget(this);
@@ -175,6 +175,8 @@ QWinWidget::QWinWidget()
      //QPushButton* browseBtn = new QPushButton(tr("&Browse"),this);
     m_Layout.addWidget(p_menu,1,0,Qt::AlignLeft);
     m_Layout.addWidget(p_Widget->toolBar,0,0);
+     connect(p_menu,&LeftMenu::loadedObjPath, this, &QWinWidget::browseButtonClicked);
+     connect(p_menu,&LeftMenu::removeBtnClicked, this,&QWinWidget::removeButtonClicked);
 
 }
 
@@ -241,29 +243,25 @@ void QWinWidget::initScene()
     sceneWidget =new QVTKOpenGLNativeWidget(this);
     sceneWidget->setStyleSheet("background-color: none; border: none;");
 
-    vtkNew<vtkNamedColors> colors;
-
-    vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
+    //vtkNew<vtkNamedColors> colors;
 
     sceneWidget->setRenderWindow(renderWindow);
     sceneWidget->resize(600, 600);
 
-    vtkSmartPointer<vtkOBJReader> reader =
-    vtkSmartPointer<vtkOBJReader>::New();
+     //reader = vtkSmartPointer<vtkOBJReader>::New();
 
-    reader->SetFileName("D:\\Downloads\\soccer+ball\\soccer ball.obj");
-    reader->Update();
+    //reader->SetFileName("D:\\Downloads\\soccer+ball\\soccer ball.obj");
+    //reader->Update();
+    actor = vtkSmartPointer<vtkActor>::New();
 
+    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    //mapper->SetInputConnection(reader->GetOutputPort());
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(reader->GetOutputPort());
+    //vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    //actor->SetMapper(mapper);
 
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-
-    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-    renderer->AddActor(actor);
+    renderer = vtkSmartPointer<vtkRenderer>::New();
+    //renderer->AddActor(actor);
     renderer->ResetCamera();
     renderer->GetActiveCamera()->Azimuth(30);
     renderer->GetActiveCamera()->Elevation(30);
@@ -271,7 +269,7 @@ void QWinWidget::initScene()
     renderer->ResetCameraClippingRange();
     renderer->SetBackground(255,255,255);
 
-    sceneWidget->renderWindow()->AddRenderer(renderer);
+    //sceneWidget->renderWindow()->AddRenderer(renderer);
     sceneWidget->renderWindow()->AddRenderer(renderer);
     sceneWidget->renderWindow()->SetWindowName("objScene");
 }
@@ -368,11 +366,52 @@ void QWinWidget::onCloseButtonClicked()
     }
 }
 
-void QWinWidget::browseButtonClicked()
+void QWinWidget::browseButtonClicked(QString path)
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-                                                        "D://",
-                                                        tr("Model (*.obj)"));
+    std::string tmp = path.toStdString();
+
+    reader = vtkSmartPointer<vtkOBJReader>::New();
+    reader->SetFileName(tmp.c_str());
+    reader->Update();
+    mapper->SetInputConnection(reader->GetOutputPort());
+
+    removeButtonClicked();
+
+    actor->SetMapper(mapper);
+    //renderer->Clear();
+    renderer->AddActor(actor);
+    //renderer->AddActor(actor);
+    renderer->ResetCamera();
+    renderer->GetActiveCamera()->Azimuth(30);
+    renderer->GetActiveCamera()->Elevation(30);
+    renderer->GetActiveCamera()->Dolly(1.5);
+    renderer->ResetCameraClippingRange();
+    renderer->SetBackground(255,255,255);
+
+    sceneWidget->renderWindow()->Render();
+
+}
+
+void QWinWidget::removeButtonClicked()
+{
+    vtkActorCollection *Actors = renderer->GetActors();
+    vtkActor *Actor;
+    for( Actors->InitTraversal(); (Actor = Actors->GetNextItem())!=NULL; )
+    {
+        renderer->RemoveActor( Actor );
+    }
+
+    renderer->ResetCamera();
+    renderer->GetActiveCamera()->Azimuth(30);
+    renderer->GetActiveCamera()->Elevation(30);
+    renderer->GetActiveCamera()->Dolly(1.5);
+    renderer->ResetCameraClippingRange();
+    renderer->SetBackground(255,255,255);
+
+    sceneWidget->update();
+    sceneWidget->updateGeometry();
+    //renderer->Render();
+    sceneWidget->renderWindow()->Render();
 }
 
 bool QWinWidget::nativeEvent(const QByteArray &, void *message, long *result)

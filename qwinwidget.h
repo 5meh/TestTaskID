@@ -72,6 +72,8 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <QVTKOpenGLNativeWidget.h>
 #include "leftmenu.h"
+#include <vtkOBJReader.h>
+#include <vtkSmartPointer.h>
 
 class QWinWidget : public QWidget
 {
@@ -91,8 +93,8 @@ public slots:
     void onMaximizeButtonClicked();
     void onMinimizeButtonClicked();
     void onCloseButtonClicked();
-    void browseButtonClicked();
-
+    void browseButtonClicked(QString path);
+    void removeButtonClicked();
 protected:
     void childEvent( QChildEvent *e ) override;
     bool eventFilter( QObject *o, QEvent *e ) override;
@@ -109,6 +111,11 @@ private:
     Widget* p_Widget;
     QVTKOpenGLNativeWidget* sceneWidget;
     LeftMenu *p_menu;
+    vtkSmartPointer<vtkOBJReader> reader;
+    vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
+    vtkSmartPointer<vtkPolyDataMapper> mapper;
+    vtkSmartPointer<vtkRenderer> renderer;
+    vtkSmartPointer<vtkActor> actor;
 
     WinNativeWindow* p_ParentWinNativeWindow;
     HWND m_ParentNativeWindowHandle;

@@ -24,6 +24,7 @@ void Widget::initToolBar()
     toolBar->setMovable(false);
     toolBar->setFloatable(false);
     toolBar->setLayout(new QHBoxLayout(this));
+    //this->setContentsMargins(0,0,0,0);
     addToolBar(toolBar);
 
     //Create a transparent-to-mouse-events widget that pads right for a fixed width equivalent to min/max/close buttons
@@ -51,16 +52,17 @@ void Widget::initToolBar()
 
     toolBar->addWidget(minimizeButton);
     toolBar->addWidget(maximizeButton);
-    QSplitter* split = new QSplitter(Qt::Orientation::Horizontal);
+
+    QSplitter* split = new QSplitter(Qt::Orientation::Horizontal, this);
+    split->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     split->setAttribute(Qt::WA_TransparentForMouseEvents);
     split->setFixedWidth(10);
-    //split->setFixedHeight(80);
-
     split->setStyleSheet("background-color: white; border: none;");
 
     toolBar->addWidget(split);
     toolBar->addWidget(closeButton);
-
+    toolBar->layout()->setContentsMargins(0,0,0,0);
+    toolBar->setContentsMargins(0,0,0,0);
     toolBar->layout()->setAlignment(minimizeButton, Qt::AlignRight);
     toolBar->layout()->setAlignment(maximizeButton, Qt::AlignRight);
     toolBar->layout()->setAlignment(closeButton, Qt::AlignRight);

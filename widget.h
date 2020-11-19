@@ -15,7 +15,7 @@ public:
 	QPushButton* minimizeButton = nullptr;
 	QPushButton* closeButton = nullptr;	
 
-	QToolBar* toolBar = nullptr;
+    QToolBar* toolBar = nullptr;
 private:
     void initTitleButtons();
     void initToolBar();

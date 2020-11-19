@@ -22,6 +22,13 @@ private:
       QLabel* captionLabel;
       QLineEdit* loadFolder;
       QGridLayout m_Layout;
+      QString fileName;
+signals:
+      void loadedObjPath(QString path);
+      void removeBtnClicked();
+private slots:
+      void load();
+      void remove();
 };
 
 #endif // LEFTMENU_H
