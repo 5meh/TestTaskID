@@ -7,4 +7,7 @@
         <file>images/minimize_app.png</file>
         <file>images/minimize_app_hovered.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>loader.gif</file>
+    </qresource>
 </RCC>

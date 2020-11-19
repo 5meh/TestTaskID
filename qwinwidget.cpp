@@ -374,13 +374,10 @@ void QWinWidget::browseButtonClicked(QString path)
     reader->SetFileName(tmp.c_str());
     reader->Update();
     mapper->SetInputConnection(reader->GetOutputPort());
-
     removeButtonClicked();
-
-    actor->SetMapper(mapper);
-    //renderer->Clear();
+    actor->SetMapper(mapper);    
     renderer->AddActor(actor);
-    //renderer->AddActor(actor);
+
     renderer->ResetCamera();
     renderer->GetActiveCamera()->Azimuth(30);
     renderer->GetActiveCamera()->Elevation(30);
@@ -389,6 +386,7 @@ void QWinWidget::browseButtonClicked(QString path)
     renderer->SetBackground(255,255,255);
 
     sceneWidget->renderWindow()->Render();
+    p_menu->movie->stop();
 
 }
 

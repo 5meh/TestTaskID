@@ -5,14 +5,29 @@
 #include <QPushButton>
 #include <QToolBar>
 
+class ButtonHoverWatcher : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ButtonHoverWatcher(QString normIcon,QString hovIcon, QObject * parent = Q_NULLPTR);
+    virtual bool eventFilter(QObject * watched, QEvent * event) Q_DECL_OVERRIDE;
+private:
+    QString normalIconPath;
+    QString hoveredIconPath;
+};
+
+
+
 class Widget : public QMainWindow
 {
     Q_OBJECT
 public:
     explicit Widget(QWidget *parent = 0);	
-
+    ButtonHoverWatcher * maximizeButtonWatcher;
 	QPushButton* maximizeButton = nullptr;
+    ButtonHoverWatcher * minimizeButtonWatcher;
 	QPushButton* minimizeButton = nullptr;
+    ButtonHoverWatcher * closeButtonWatcher;
 	QPushButton* closeButton = nullptr;	
 
     QToolBar* toolBar = nullptr;

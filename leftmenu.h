@@ -10,17 +10,21 @@
 class QLabel;
 class QPushButton;
 class QLineEdit;
+#include <QMovie>
+//class QMovie;
 
 class LeftMenu: public QWidget
 {
     Q_OBJECT
 public:
     LeftMenu(QWidget *parent = nullptr);
+      QMovie *movie;//uh lazy to make private access etc
 private:
       QPushButton* loadBtn;
       QPushButton* removeBtn;
       QLabel* captionLabel;
-      QLineEdit* loadFolder;
+      QLabel* fileNameLabel;
+      QLabel* loaderLabel;
       QGridLayout m_Layout;
       QString fileName;
 signals:

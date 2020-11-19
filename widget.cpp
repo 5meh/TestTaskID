@@ -4,6 +4,37 @@
 #include <QLayout>
 #include <QSplitter>
 #include <QSizePolicy>
+#include <QEvent>
+
+ButtonHoverWatcher::ButtonHoverWatcher(QString normIcon,QString hovIcon, QObject * parent):
+    QObject(parent),
+    normalIconPath(normIcon),
+    hoveredIconPath(hovIcon)
+{
+
+}
+
+bool ButtonHoverWatcher::eventFilter(QObject * watched, QEvent * event)
+{
+    QPushButton * button = qobject_cast<QPushButton*>(watched);
+    if (!button) {
+        return false;
+    }
+
+    if (event->type() == QEvent::Enter) {
+        // The push button is hovered by mouse
+        button->setIcon(QIcon(hoveredIconPath));
+        return true;
+    }
+
+    if (event->type() == QEvent::Leave){
+        // The push button is not hovered by mouse
+        button->setIcon(QIcon(normalIconPath));
+        return true;
+    }
+
+    return false;
+}
 
 Widget::Widget(QWidget *parent)
 	: QMainWindow(parent)
@@ -74,9 +105,17 @@ void Widget::initToolBar()
 void Widget::initTitleButtons()
 {
     //Create the min/max/close buttons
+    minimizeButtonWatcher = new ButtonHoverWatcher(":/icons/images/minimize_app.png", ":/icons/images/minimize_app_hovered.png", this);
     minimizeButton = new QPushButton(QIcon(":/icons/images/minimize_app.png"),"");
+    minimizeButton->installEventFilter(minimizeButtonWatcher);
+
+    maximizeButtonWatcher = new ButtonHoverWatcher(":/icons/images/max_app.png", ":/icons/images/max_app_ hovered.png", this);
     maximizeButton = new QPushButton(QIcon(":/icons/images/max_app.png"),"");
+    maximizeButton->installEventFilter(maximizeButtonWatcher);
+
+    closeButtonWatcher = new ButtonHoverWatcher(":/icons/images/close_app.png", ":/icons/images/close_app_hovered.png", this);
     closeButton = new QPushButton(QIcon(":/icons/images/close_app.png"),"");
+    closeButton->installEventFilter(closeButtonWatcher);
 
     closeButton->iconSize().boundedTo(closeButton->size());
 
