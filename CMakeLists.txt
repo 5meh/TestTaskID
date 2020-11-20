@@ -1,6 +1,5 @@
 project(TestTaskDI LANGUAGES CXX)
 
-set(VTK_DIR "C:\\Program Files (x86)\\VTK")
 find_package(VTK REQUIRED)
 include_directories(SYSTEM ${VTK_INCLUDE_DIRS})
 include(${VTK_USE_FILE})
