@@ -51,30 +51,29 @@
 #ifndef QWINWIDGET_H
 #define QWINWIDGET_H
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QGridLayout>
-
 #include "widget.h"
 #include "winnativewindow.h"
+#include "leftmenu.h"
+
+#include <QWidget>
+#include <QGridLayout>
+#include <QFutureWatcher>
+
+#include <QVTKOpenGLNativeWidget.h>
 #include "vtkOpenGLRenderWindow.h"
 #include "QVTKOpenGLWindow.h"
 #include <vtkActor.h>
 #include <vtkGenericOpenGLRenderWindow.h>
-#include <vtkNamedColors.h>
 #include <vtkNew.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkSphereSource.h>
 #include <vtkVersion.h>
 #include <vtkOpenGLRenderWindow.h>
-#include <QVTKOpenGLNativeWidget.h>
-#include "leftmenu.h"
 #include <vtkOBJReader.h>
 #include <vtkSmartPointer.h>
-#include <QFutureWatcher>
+
 
 class QWinWidget : public QWidget
 {
