@@ -1,4 +1,3 @@
-#include "mainwindow.h"
 #include "qwinwidget.h"
 
 #include <QApplication>
