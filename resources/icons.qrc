@@ -9,5 +9,6 @@
     </qresource>
     <qresource prefix="/">
         <file>loader.gif</file>
+        <file>ObjViewerLogo.png</file>
     </qresource>
 </RCC>

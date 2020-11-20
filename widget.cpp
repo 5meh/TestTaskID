@@ -11,7 +11,6 @@ ButtonHoverWatcher::ButtonHoverWatcher(QString normIcon,QString hovIcon, QObject
     normalIconPath(normIcon),
     hoveredIconPath(hovIcon)
 {
-
 }
 
 bool ButtonHoverWatcher::eventFilter(QObject * watched, QEvent * event)
@@ -37,7 +36,14 @@ bool ButtonHoverWatcher::eventFilter(QObject * watched, QEvent * event)
 }
 
 Widget::Widget(QWidget *parent)
-	: QMainWindow(parent)
+    : QMainWindow(parent),
+      maximizeButtonWatcher(nullptr),
+      maximizeButton(nullptr),
+      minimizeButtonWatcher(nullptr),
+      minimizeButton(nullptr),
+      closeButtonWatcher(nullptr),
+      closeButton(nullptr),
+      toolBar(nullptr)
 {	
 	QPalette Pal(palette());
     Pal.setColor(QPalette::Background, Qt::white);
@@ -54,21 +60,15 @@ void Widget::initToolBar()
     toolBar = new QToolBar(this);
     toolBar->setMovable(false);
     toolBar->setFloatable(false);
-    toolBar->setLayout(new QHBoxLayout(this));
-    //this->setContentsMargins(0,0,0,0);
+    toolBar->setLayout(new QHBoxLayout(this));    
     addToolBar(toolBar);
 
-    //Create a transparent-to-mouse-events widget that pads right for a fixed width equivalent to min/max/close buttons
-    QWidget* btnSpacer = new QWidget(toolBar);
-    btnSpacer->setAttribute(Qt::WA_TransparentForMouseEvents);
-    btnSpacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    btnSpacer->setStyleSheet("background-color: none; border: none;");
-    btnSpacer->setFixedWidth(135 /* rough width of close/min/max buttons */);
-    toolBar->addWidget(btnSpacer);
     toolBar->setStyleSheet("background-color: black; border: none;");
 
-    QLabel* titleLabel = new QLabel("ObjViewer");
-    titleLabel->setStyleSheet("QLabel { color : white; }");
+    QLabel* titleLabel = new QLabel(this);
+    titleLabel->setPixmap(QPixmap(":/ObjViewerLogo.png"));
+    titleLabel->setMaximumHeight(80);
+    //titleLabel->setStyleSheet("QLabel { color : white; }");
     titleLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     QWidget* rightSpacer = new QWidget(toolBar);
@@ -92,8 +92,8 @@ void Widget::initToolBar()
 
     toolBar->addWidget(split);
     toolBar->addWidget(closeButton);
-    toolBar->layout()->setContentsMargins(0,0,0,0);
-    toolBar->setContentsMargins(0,0,0,0);
+    toolBar->layout()->setAlignment(Qt::AlignLeft);
+
     toolBar->layout()->setAlignment(minimizeButton, Qt::AlignRight);
     toolBar->layout()->setAlignment(maximizeButton, Qt::AlignRight);
     toolBar->layout()->setAlignment(closeButton, Qt::AlignRight);
@@ -103,25 +103,24 @@ void Widget::initToolBar()
 }
 
 void Widget::initTitleButtons()
-{
-    //Create the min/max/close buttons
+{  
     minimizeButtonWatcher = new ButtonHoverWatcher(":/icons/images/minimize_app.png", ":/icons/images/minimize_app_hovered.png", this);
-    minimizeButton = new QPushButton(QIcon(":/icons/images/minimize_app.png"),"");
+    minimizeButton = new QPushButton(QIcon(":/icons/images/minimize_app.png"),"",this);
     minimizeButton->installEventFilter(minimizeButtonWatcher);
 
     maximizeButtonWatcher = new ButtonHoverWatcher(":/icons/images/max_app.png", ":/icons/images/max_app_ hovered.png", this);
-    maximizeButton = new QPushButton(QIcon(":/icons/images/max_app.png"),"");
+    maximizeButton = new QPushButton(QIcon(":/icons/images/max_app.png"),"",this);
     maximizeButton->installEventFilter(maximizeButtonWatcher);
 
     closeButtonWatcher = new ButtonHoverWatcher(":/icons/images/close_app.png", ":/icons/images/close_app_hovered.png", this);
-    closeButton = new QPushButton(QIcon(":/icons/images/close_app.png"),"");
+    closeButton = new QPushButton(QIcon(":/icons/images/close_app.png"),"",this);
     closeButton->installEventFilter(closeButtonWatcher);
 
-    closeButton->iconSize().boundedTo(closeButton->size());
 
+    closeButton->iconSize().boundedTo(closeButton->size());
     closeButton->setStyleSheet("background-color: rgb(255, 140, 0); color: none");
 
-    closeButton->setFlat(true);
+    closeButton->setFlat(true);    
     minimizeButton->setFlat(true);
     maximizeButton->setFlat(true);
     maximizeButton->setCheckable(true);

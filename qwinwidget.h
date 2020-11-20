@@ -104,13 +104,13 @@ protected:
     void focusInEvent(QFocusEvent *e) override;
 
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-
+signals:
+    void objLoaded();
 private slots:
     void handleObjLoaded();
 private:
     void LoadObj();
     QGridLayout m_Layout;
-
     Widget* p_Widget;
     QVTKOpenGLNativeWidget* sceneWidget;
     LeftMenu *p_menu;
@@ -134,8 +134,6 @@ private:
     void saveFocus();
     void resetFocus();
     void initScene();
-
-
 
 };
 

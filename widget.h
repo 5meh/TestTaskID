@@ -22,15 +22,15 @@ class Widget : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Widget(QWidget *parent = 0);	
+    explicit Widget(QWidget *parent = 0);
     ButtonHoverWatcher * maximizeButtonWatcher;
-	QPushButton* maximizeButton = nullptr;
+    QPushButton* maximizeButton;
     ButtonHoverWatcher * minimizeButtonWatcher;
-	QPushButton* minimizeButton = nullptr;
+    QPushButton* minimizeButton;
     ButtonHoverWatcher * closeButtonWatcher;
-	QPushButton* closeButton = nullptr;	
+    QPushButton* closeButton;
 
-    QToolBar* toolBar = nullptr;
+    QToolBar* toolBar;
 private:
     void initTitleButtons();
     void initToolBar();

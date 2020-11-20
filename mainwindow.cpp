@@ -24,81 +24,18 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout* titleButtonsLayout = new QVBoxLayout(this);
     titleButtonsLayout->addWidget(maximizeBtn, Qt::AlignRight);
     titleButtonsLayout->addWidget(closeBtn, Qt::AlignRight);
-    //this->setLayout(new QVBoxLayout(this));
 
-    //this->centralWidget()->layout()->addItem(titleButtonsLayout);
-    //this->layout()->addItem(titleButtonsLayout);
+    widget =new QVTKOpenGLNativeWidget();
 
-   /* QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
-    viewer = new QVTKOpenGLNativeWidget(this);
+    vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
 
-    setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    this->setGeometry(200,200,1000,6000);
-    vtkSmartPointer<vtkOBJReader> reader =
-        vtkSmartPointer<vtkOBJReader>::New();
-      reader->SetFileName("D:\\Downloads\\soccer+ball\\soccer ball.obj");
-      reader->Update();
+    widget->setRenderWindow(renderWindow);
+    widget->resize(600, 600);
 
+    vtkSmartPointer<vtkOBJReader> reader = vtkSmartPointer<vtkOBJReader>::New();
 
-       vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
-
-       viewer->setRenderWindow(renderWindow);
-      // Visualize
-      vtkSmartPointer<vtkNamedColors> colors =
-        vtkSmartPointer<vtkNamedColors>::New();
-      vtkColor3d backgroundColor = colors->GetColor3d("SpringGreen");
-      vtkColor3d actorColor      = colors->GetColor3d("HoneyDew");
-
-      vtkSmartPointer<vtkPolyDataMapper> mapper =
-        vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInputConnection(reader->GetOutputPort());
-
-      vtkSmartPointer<vtkActor> actor =
-        vtkSmartPointer<vtkActor>::New();
-      actor->SetMapper(mapper);
-      actor->GetProperty()->SetDiffuseColor(actorColor.GetData());
-
-      vtkSmartPointer<vtkRenderer> renderer =
-        vtkSmartPointer<vtkRenderer>::New();
-      renderer->AddActor(actor);
-      renderer->SetBackground(backgroundColor.GetData());
-      renderer->ResetCamera();
-      renderer->GetActiveCamera()->Azimuth(30);
-      renderer->GetActiveCamera()->Elevation(30);
-      renderer->GetActiveCamera()->Dolly(1.5);
-      renderer->ResetCameraClippingRange();
-      viewer->renderWindow()->AddRenderer(renderer);
-
-
-
-      //vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow =
-      //vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-      //renderWindow->AddRenderer(renderer);
-      //viewer->setRenderWindow(renderWindow);
-      //vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-      //vtkSmartPointer<vtkRenderWindowInteractor>::New();
-      //renderWindowInteractor->SetRenderWindow(viewer->renderWindow());
-      //renderWindow->Render();
-      viewer->renderWindow()->Render();
-       viewer->show();
-        //renderWindowInteractor->Start();*/
-
-
-       //QVTKOpenGLNativeWidget widget;
-        widget =new QVTKOpenGLNativeWidget();
-
-        vtkNew<vtkNamedColors> colors;
-
-        vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
-
-        widget->setRenderWindow(renderWindow);
-        widget->resize(600, 600);
-
-        vtkSmartPointer<vtkOBJReader> reader =
-            vtkSmartPointer<vtkOBJReader>::New();
-
-          reader->SetFileName("D:\\Downloads\\soccer+ball\\soccer ball.obj");
-          reader->Update();
+    reader->SetFileName("D:\\Downloads\\soccer+ball\\soccer ball.obj");
+    reader->Update();
 
         //vtkNew<vtkSphereSource> sphereSource;
 

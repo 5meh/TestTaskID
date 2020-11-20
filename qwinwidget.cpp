@@ -133,7 +133,7 @@ QWinWidget::QWinWidget()
     setContentsMargins(0, 0, 0, 0);
     setLayout(&m_Layout);
     m_Layout.setContentsMargins(0, 0, 0, 0);
-    //m_Layout.setSpacing(0);
+
 
     //Create the true app widget 
     p_Widget = new Widget(this);
@@ -143,31 +143,11 @@ QWinWidget::QWinWidget()
 
     //Update the BORDERWIDTH value if needed for HiDPI displays
     BORDERWIDTH = BORDERWIDTH * window()->devicePixelRatio(); 
+    TOOLBARHEIGHT = p_Widget->toolBar->height() * window()->devicePixelRatio();
 
-	//Update the TOOLBARHEIGHT value to match the height of toolBar * if needed, the HiDPI display
-	if (p_Widget->toolBar)
-	{
-		TOOLBARHEIGHT = p_Widget->toolBar->height() * window()->devicePixelRatio();
-	}
-
-
-    //You need to keep the native window in sync with the Qt window & children, so wire min/max/close buttons to 
-	//slots inside of QWinWidget. QWinWidget can then talk with the native window as needed 
-	if (p_Widget->minimizeButton)
-	{
-		connect(p_Widget->minimizeButton, &QPushButton::clicked, this, &QWinWidget::onMinimizeButtonClicked);
-	}
-	if (p_Widget->maximizeButton)
-	{
-		connect(p_Widget->maximizeButton, &QPushButton::clicked, this, &QWinWidget::onMaximizeButtonClicked);
-
-	}
-	if (p_Widget->closeButton)
-	{
-		connect(p_Widget->closeButton, &QPushButton::clicked, this, &QWinWidget::onCloseButtonClicked);
-	}
-
-	
+    connect(p_Widget->minimizeButton, &QPushButton::clicked, this, &QWinWidget::onMinimizeButtonClicked);
+    connect(p_Widget->maximizeButton, &QPushButton::clicked, this, &QWinWidget::onMaximizeButtonClicked);
+    connect(p_Widget->closeButton, &QPushButton::clicked, this, &QWinWidget::onCloseButtonClicked);
 
     //Send the parent native window a WM_SIZE message to update the widget size 
     SendMessage(m_ParentNativeWindowHandle, WM_SIZE, 0, 0);
@@ -175,12 +155,12 @@ QWinWidget::QWinWidget()
     initScene();
     p_Widget->setCentralWidget(sceneWidget);
     p_menu = new LeftMenu(this);
-     //QPushButton* browseBtn = new QPushButton(tr("&Browse"),this);
+
     m_Layout.addWidget(p_menu,1,0,Qt::AlignLeft);
     m_Layout.addWidget(p_Widget->toolBar,0,0);
-     connect(p_menu,&LeftMenu::loadedObjPath, this, &QWinWidget::browseButtonClicked);
-     connect(p_menu,&LeftMenu::removeBtnClicked, this,&QWinWidget::removeButtonClicked);
-
+    connect(p_menu, &LeftMenu::loadedObjPath, this, &QWinWidget::browseButtonClicked);
+    connect(p_menu, &LeftMenu::removeBtnClicked, this, &QWinWidget::removeButtonClicked);
+    connect(this, &QWinWidget::objLoaded, p_menu, &LeftMenu::stopLoadingAnimation);
 }
 
 
@@ -188,8 +168,7 @@ QWinWidget::QWinWidget()
     Destroys this object, freeing all allocated resources.
 */
 QWinWidget::~QWinWidget()
-{
-    //delete sceneWidget;
+{   
 }
 
 /*!
@@ -206,15 +185,18 @@ HWND QWinWidget::getParentWindow() const
 void QWinWidget::childEvent(QChildEvent *e)
 {
     QObject *obj = e->child();
-    if (obj->isWidgetType()) {
-        if (e->added()) {
-        if (obj->isWidgetType()) {
-            obj->installEventFilter(this);
+    if (obj->isWidgetType())
+    {
+        if (e->added())
+        {
+            if (obj->isWidgetType())
+                obj->installEventFilter(this);
         }
-        } else if (e->removed() && _reenableParent) {
-        _reenableParent = false;
-        EnableWindow(m_ParentNativeWindowHandle, true);
-            obj->removeEventFilter(this);
+        else if (e->removed() && _reenableParent)
+        {
+            _reenableParent = false;
+            EnableWindow(m_ParentNativeWindowHandle, true);
+                obj->removeEventFilter(this);
         }
     }
     QWidget::childEvent(e);
@@ -246,25 +228,13 @@ void QWinWidget::initScene()
     sceneWidget =new QVTKOpenGLNativeWidget(this);
     sceneWidget->setStyleSheet("background-color: none; border: none;");
 
-    //vtkNew<vtkNamedColors> colors;
-
     sceneWidget->setRenderWindow(renderWindow);
     sceneWidget->resize(600, 600);
 
-     //reader = vtkSmartPointer<vtkOBJReader>::New();
-
-    //reader->SetFileName("D:\\Downloads\\soccer+ball\\soccer ball.obj");
-    //reader->Update();
     actor = vtkSmartPointer<vtkActor>::New();
-
     mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    //mapper->SetInputConnection(reader->GetOutputPort());
-
-    //vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    //actor->SetMapper(mapper);
-
     renderer = vtkSmartPointer<vtkRenderer>::New();
-    //renderer->AddActor(actor);
+
     renderer->ResetCamera();
     renderer->GetActiveCamera()->Azimuth(30);
     renderer->GetActiveCamera()->Elevation(30);
@@ -272,7 +242,6 @@ void QWinWidget::initScene()
     renderer->ResetCameraClippingRange();
     renderer->SetBackground(255,255,255);
 
-    //sceneWidget->renderWindow()->AddRenderer(renderer);
     sceneWidget->renderWindow()->AddRenderer(renderer);
     sceneWidget->renderWindow()->SetWindowName("objScene");
 }
@@ -294,7 +263,8 @@ void QWinWidget::initScene()
 void QWinWidget::center()
 {
     const QWidget *child = findChild<QWidget*>();
-    if (child && !child->isWindow()) {
+    if (child && !child->isWindow())
+    {
         qWarning("QWinWidget::center: Call this function only for QWinWidgets with toplevel children");
     }
     RECT r;
@@ -329,9 +299,11 @@ void QWinWidget::setGeometry(int x, int y, int w, int h)
 void QWinWidget::resetFocus()
 {
     if (_prevFocus)
+    {
         ::SetFocus(_prevFocus);
-    else
-        ::SetFocus(getParentWindow());
+        return;
+    }
+    ::SetFocus(getParentWindow());
 }
 
 //Tell the parent native window to minimize
@@ -346,32 +318,19 @@ void QWinWidget::onMaximizeButtonClicked()
     if (p_Widget->maximizeButton->isChecked())
     {
         SendMessage(m_ParentNativeWindowHandle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+        return;
     }
-    else
-    {
-        SendMessage(m_ParentNativeWindowHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
-    }
+    SendMessage(m_ParentNativeWindowHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
 }
 
 void QWinWidget::onCloseButtonClicked()
 {
-    if(true /* put your check for it if it safe to close your app here */) //eg, does the user need to save a document
-    {
-		//Safe to close, so hide the parent window
-        ShowWindow(m_ParentNativeWindowHandle, false);
-
-		//And then quit
-        QApplication::quit();
-    }
-    else
-    {
-        //Do nothing, and thus, don't actually close the window
-    }
+     ShowWindow(m_ParentNativeWindowHandle, false);
+     QApplication::quit();
 }
 
 void QWinWidget::LoadObj()
 {
-    std::string str = reader->GetFileName();
     reader->Update();
 }
 
@@ -395,32 +354,17 @@ void QWinWidget::handleObjLoaded()
     renderer->SetBackground(255,255,255);
 
     sceneWidget->renderWindow()->Render();
-    p_menu->movie->stop();
+    emit objLoaded();
 }
 
 void QWinWidget::browseButtonClicked(QString path)
 {
     objFilePath = path;
-
     reader = vtkSmartPointer<vtkOBJReader>::New();
     reader->SetFileName(objFilePath.toStdString().c_str());
     QFuture<void> future = QtConcurrent::run(&*this, &QWinWidget::LoadObj);
     connect(&watcher, &QFutureWatcher<void>::finished, &*this, &QWinWidget::handleObjLoaded);
     watcher.setFuture(future);
-    //tcher.
-    //reader->Update();
-
-
-//    renderer->ResetCamera();
-//    renderer->GetActiveCamera()->Azimuth(30);
-//    renderer->GetActiveCamera()->Elevation(30);
-//    renderer->GetActiveCamera()->Dolly(1.5);
-//    renderer->ResetCameraClippingRange();
-//    renderer->SetBackground(255,255,255);
-
-//    sceneWidget->renderWindow()->Render();
-//    p_menu->movie->stop();
-
 }
 
 void QWinWidget::removeButtonClicked()
@@ -431,17 +375,6 @@ void QWinWidget::removeButtonClicked()
     {
         renderer->RemoveActor( Actor );
     }
-
-    renderer->ResetCamera();
-    renderer->GetActiveCamera()->Azimuth(30);
-    renderer->GetActiveCamera()->Elevation(30);
-    renderer->GetActiveCamera()->Dolly(1.5);
-    renderer->ResetCameraClippingRange();
-    renderer->SetBackground(255,255,255);
-
-    sceneWidget->update();
-    sceneWidget->updateGeometry();
-    //renderer->Render();
     sceneWidget->renderWindow()->Render();
 }
 
@@ -465,19 +398,8 @@ bool QWinWidget::nativeEvent(const QByteArray &, void *message, long *result)
     //Only close if safeToClose clears()
     if (msg->message == WM_CLOSE)
     {
-		if (true /* put your check for it if it safe to close your app here */) //eg, does the user need to save a document
-		{
-			//Safe to close, so hide the parent window
-			ShowWindow(m_ParentNativeWindowHandle, false);
-
-			//And then quit
-			QApplication::quit();
-		}
-		else
-        {
-            *result = 0; //Set the message to 0 to ignore it, and thus, don't actually close
-            return true;
-        }
+        ShowWindow(m_ParentNativeWindowHandle, false);
+        QApplication::quit();
     }
 
     //Double check WM_SIZE messages to see if the parent native window is maximized
@@ -519,7 +441,7 @@ bool QWinWidget::nativeEvent(const QByteArray &, void *message, long *result)
             {
                 //If the mouse is over top of the toolbar area BUT is actually positioned over a child widget of the toolbar, 
 				//Then we don't want to enable dragging. This allows for buttons in the toolbar, eg, a Maximize button, to keep the mouse interaction
-				if (QApplication::widgetAt(QCursor::pos()) != p_Widget->toolBar)
+                if (QApplication::widgetAt(QCursor::pos()) != p_Widget->toolBar)
                     return false;
 	    	}
 			
@@ -662,28 +584,36 @@ void QWinWidget::focusInEvent(QFocusEvent *e)
 bool QWinWidget::focusNextPrevChild(bool next)
 {
     QWidget *curFocus = focusWidget();
-    if (!next) {
-        if (!curFocus->isWindow()) {
+    if (!next)
+    {
+        if (!curFocus->isWindow())
+        {
             QWidget *nextFocus = curFocus->nextInFocusChain();
             QWidget *prevFocus = 0;
             QWidget *topLevel = 0;
-            while (nextFocus != curFocus) {
-                if (nextFocus->focusPolicy() & Qt::TabFocus) {
+            while (nextFocus != curFocus)
+            {
+                if (nextFocus->focusPolicy() & Qt::TabFocus)
+                {
                     prevFocus = nextFocus;
                     topLevel = 0;
                 }
                 nextFocus = nextFocus->nextInFocusChain();
             }
 
-            if (!topLevel) {
+            if (!topLevel)
+            {
                 return QWidget::focusNextPrevChild(false);
             }
         }
-    } else {
+    } else
+    {
         QWidget *nextFocus = curFocus;
-        while (1 && nextFocus != 0) {
+        while (1 && nextFocus != 0)
+        {
             nextFocus = nextFocus->nextInFocusChain();
-            if (nextFocus->focusPolicy() & Qt::TabFocus) {
+            if (nextFocus->focusPolicy() & Qt::TabFocus)
+            {
                 return QWidget::focusNextPrevChild(true);
             }
         }

@@ -19,9 +19,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 
 add_executable(TestTaskDI
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h 
+    main.cpp  
     qwinwidget.cpp
     qwinwidget.h
     widget.cpp
