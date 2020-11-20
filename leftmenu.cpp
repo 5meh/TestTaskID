@@ -67,7 +67,7 @@ void LeftMenu::load()
      if(fileName.isEmpty())
          return;
     QFileInfo info(fileName);
-    fileNameLabel->setText(info.completeBaseName());
+    fileNameLabel->setText(info.fileName());
     fileNameLabel->show();
     loaderLabel->show();
     movie->start();

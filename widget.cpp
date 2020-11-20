@@ -55,8 +55,6 @@ Widget::Widget(QWidget *parent)
 void Widget::initToolBar()
 {
 
-#ifdef _WIN32
-
     toolBar = new QToolBar(this);
     toolBar->setMovable(false);
     toolBar->setFloatable(false);
@@ -68,7 +66,6 @@ void Widget::initToolBar()
     QLabel* titleLabel = new QLabel(this);
     titleLabel->setPixmap(QPixmap(":/ObjViewerLogo.png"));
     titleLabel->setMaximumHeight(80);
-    //titleLabel->setStyleSheet("QLabel { color : white; }");
     titleLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     QWidget* rightSpacer = new QWidget(toolBar);
@@ -98,7 +95,6 @@ void Widget::initToolBar()
     toolBar->layout()->setAlignment(maximizeButton, Qt::AlignRight);
     toolBar->layout()->setAlignment(closeButton, Qt::AlignRight);
     toolBar->layout()->setAlignment(titleLabel, Qt::AlignLeft);
-#endif
 
 }
 
